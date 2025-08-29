@@ -72,7 +72,7 @@ function NotesDetails() {
         <div className="bg-black p-10">
           <div>
             <textarea
-              value={contentValue ? contentValue : textContent}
+              value={contentValue ? contentValue : textContent} 
               onChange={(e) => setContent(e.target.value)}
               className="w-full h-40 p-2 rounded resize-none outline-none bg-transparent text-white"
               placeholder="Start typing..."
