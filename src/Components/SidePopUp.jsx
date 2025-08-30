@@ -14,7 +14,7 @@ function SidePopUp({ favorites, setFavorites, archived,
   setArchived,
   remove,
   setRemove }) {
-  console.log(favorites);
+  // console.log(favorites);
 
   return (
     <div className='bg-gray-600 w-50 py-2 rounded-2xl' >
