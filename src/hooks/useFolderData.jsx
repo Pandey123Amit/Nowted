@@ -15,10 +15,11 @@ const getFolder = async () => {
 
 // console.log(getFolder(),"jh");
 
-export function useFolderData() {
+export function useFolderData(notesId) {
   return useQuery({
     queryKey: ['folders'],
     queryFn: getFolder,
+    enabled: !!notesId
   })
 }
 
@@ -28,7 +29,7 @@ const getFolderById = async (folderId) => {
   const res = await axios.get(
     `https://nowted-server.remotestate.com/notes?archived=false&favorite=false&deleted=false&folderId=${folderId}&page=1&limit=10`
   );
-  // console.log("notes",res.data);
+  console.log("folderid",res.data);
 
   return res.data;
 };
@@ -39,7 +40,7 @@ export function useFolderDataById(folderId) {
     queryKey: ["foldersById", folderId],
     queryFn: () => getFolderById(folderId),
     enabled: !!folderId,
-    // selec
+    
   })
 }
 

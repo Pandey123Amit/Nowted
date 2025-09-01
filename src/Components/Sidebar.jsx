@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import logo from '../assets/logo.svg'
 import folder from '../assets/folder.svg'
 import trash from '../assets/trash.svg'
@@ -8,20 +8,27 @@ import notes from '../assets/notes.svg'
 import search from '../assets/search.svg'
 import useRecentsData from '../hooks/useRecentsData'
 import { useFolderData } from '../hooks/useFolderData'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useParams } from 'react-router-dom'
 
 
 
 const Sidebar = () => {
+  const { notesId } = useParams()
+  // console.log('side',notesId);
+  
   const navigate = useNavigate()
   const [enableSearchBox, setEnableSearchBox] = useState(false)
 
-  const { data } = useRecentsData();
-  // console.log(data);
+  const { data,refetch } = useRecentsData(notesId);
+  // console.log("notesdata",data);
 
-  const { data: folderData } = useFolderData();
+  const { data: folderData } = useFolderData(notesId);
   // console.log("jks", folderData);
   // console.log(data,"fd");
+
+  useEffect(()=>{
+    refetch()
+  },[notesId,data?.recentNotes?.preview])
 
 
 
