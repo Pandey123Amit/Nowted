@@ -7,12 +7,10 @@ const getRecent = async () => {
   }
 
 
-export default function useRecentsData(notesId) {
+export default function useRecentsData() {
    return useQuery({
     queryKey: ['recent-key'],
     queryFn: getRecent,
-    enabled: !!notesId,
-
 
   })
 }

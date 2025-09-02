@@ -15,11 +15,10 @@ const getFolder = async () => {
 
 // console.log(getFolder(),"jh");
 
-export function useFolderData(notesId) {
+export function useFolderData() {
   return useQuery({
     queryKey: ['folders'],
     queryFn: getFolder,
-    enabled: !!notesId
   })
 }
 
@@ -27,7 +26,7 @@ const getFolderById = async (folderId) => {
   // console.log("getFolderById", folderId);
 
   const res = await axios.get(
-    `https://nowted-server.remotestate.com/notes?archived=false&favorite=false&deleted=false&folderId=${folderId}&page=1&limit=10`
+    `https://nowted-server.remotestate.com/notes?archived=false&deleted=false&folderId=${folderId}&page=1&limit=10`
   );
   console.log("folderid",res.data);
 

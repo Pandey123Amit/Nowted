@@ -8,21 +8,22 @@ import notes from '../assets/notes.svg'
 import search from '../assets/search.svg'
 import useRecentsData from '../hooks/useRecentsData'
 import { useFolderData } from '../hooks/useFolderData'
-import { Outlet, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 
 
 const Sidebar = () => {
   const { notesId } = useParams()
-  // console.log('side',notesId);
+  
   
   const navigate = useNavigate()
   const [enableSearchBox, setEnableSearchBox] = useState(false)
 
-  const { data,refetch } = useRecentsData(notesId);
-  // console.log("notesdata",data);
+  const { data,refetch } = useRecentsData();
+  
+  console.log("notesdata",data);
 
-  const { data: folderData } = useFolderData(notesId);
+  const { data: folderData } = useFolderData();
   // console.log("jks", folderData);
   // console.log(data,"fd");
 
@@ -69,6 +70,7 @@ const Sidebar = () => {
             {data && data.recentNotes && data.recentNotes.length > 0 ? (
               data.recentNotes.map((recent) => (
                 <div
+                
                   onClick={() => navigate(`notes/${recent.folder.id}`)}
                   key={recent.id}
                   className="flex items-center gap-2 m-1 hover:bg-gray-800 p-1 rounded cursor-pointer"
