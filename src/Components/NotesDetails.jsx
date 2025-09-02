@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import dateIm from '../assets/date.svg';
 import dotImg from '../assets/dot.svg';
@@ -6,11 +6,13 @@ import folderImg from '../assets/notes.svg';
 import { useNotesDataById } from "../hooks/useFolderData";
 import SidePopUp from "./SidePopUp";
 import useDebounce from "../hooks/useDebounce";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import EmptyNotesView from "./EmptyView";
 
 
 function NotesDetails() {
+ const queryClient = useQueryClient();
   const [favorites, setFavorites] = useState(false)
   const [archived, setArchived] = useState(false)
   // const [isDtatChanges,setIsDtatChanges]=useState(false)
@@ -20,17 +22,32 @@ function NotesDetails() {
   const [contentValue, setContent] = useState("");
   const { notesId } = useParams()
   const { data,refetch } = useNotesDataById(notesId)
+
+  
 //  const {}= useFolderDataById(folderId);
  
  const debouncedValue= useDebounce(contentValue, 1000);
+
   // debouncedValue ? setIsDtatChanges(true):null
 
   const date = new Date(data?.createdAt).toLocaleDateString("en-GB");
-  const updateTextMutation = useMutation({
-    mutationFn: async (note) => {
+  
+
+    useEffect(() => {
+      
+      if (data?.content?.length){
+        
+        setContent(() => data?.content);
+       setIsUserTyping(false); }
+    }, [notesId, data?.content])
+        console.log(contentValue,contentValue.length,"inside","debouncedValue",debouncedValue);
+
+  const  updateTextMutation = useMutation({
+    mutationFn: async (content) => {
       return await axios.patch(
         `https://nowted-server.remotestate.com/notes/${notesId}`,
-        note,
+
+        content,
         {
           headers: {
             "Content-Type": "application/json",
@@ -38,45 +55,67 @@ function NotesDetails() {
         }
       );
     },
-    onSuccess:()=>refetch(),
-    onError:(err)=>console.log(err,"kjk")
+    onSuccess:()=>{queryClient.invalidateQueries(["recent-key"]);
+      refetch()
+    },
+    onError:(err)=>console.log(err,"kjk"),
     
   });
 
   useEffect(() => {
-    // if (!data?.content) return
-    if (data?.content?.length){
-      setContent(() => data?.content);
-     setIsUserTyping(false); }
-  }, [notesId, data?.content])
-
-  useEffect(() => {
-    console.log(debouncedValue,"kyooo");
-    console.log(isUserTyping,"isUserTyping");
+    // console.log(debouncedValue,"kyooo");
+    // console.log(isUserTyping,"isUserTyping"); 
+    // console.log('favorites',favorites);
+    // console.log('archived111',archived);
     
-    
-   isUserTyping && debouncedValue && updateTextMutation.mutate({
+     
+    // //  updateTextMutation.mutate({
+    //   isFavorite:favorites
+    // });
+    //  updateTextMutation.mutate({
+    //   isArchived:remove
+    // });
+    //  updateTextMutation.mutate({
+    //   isArchived:archived
+    // });
+   isUserTyping && updateTextMutation.mutate({
         content: debouncedValue,
       });
   }, [debouncedValue])
+  // console.log('dot',dot);
+  
 
   return (
-    <div className="bg-black-300 h-full w-full p-5">
+    <>
+    {data?.isArchived ?(<EmptyNotesView />):
+      <div onClick={() => setDot(false)} className="bg-black-300 h-full w-full p-5">
       <div className="bg-black h-full w-full py-8 px-10">
         <div className="p-3 bg-black flex justify-between">
           <h1 className="text-amber-50 font-bold font-sans text-3xl">{data?.folder?.name}</h1>
           <div>
-            <img onClick={() => setDot(!dot)}
+            <img onClick={(e) =>{
+              e.stopPropagation();
+              e.preventDefault()
+              setDot(!dot)
+            } }
               className="h-9  relative w-9 border bg-gray-800 rounded-full"
               src={dotImg}
               alt="dot"
             />
             <div className="absolute right-20 p-1">
-              {dot && <SidePopUp
+              {dot && <SidePopUp 
                 favorites={favorites}
-                setFavorites={setFavorites}
+                setFavorites={(val)=>{
+                   setFavorites(val);
+                   updateTextMutation.mutate({ isFavorite: val });
+                }}
                 archived={archived}
-                setArchived={setArchived}
+                setArchived={(val)=>{
+                  console.log(val);
+                  
+                   setArchived(val);
+                   updateTextMutation.mutate({ isArchived: val });
+                }}
                 remove={remove}
                 setRemove={setRemove}
 
@@ -114,8 +153,8 @@ function NotesDetails() {
           </div>
         </div>
       </div>
-    </div>
-
+    </div>}
+</>
   )
 }
 

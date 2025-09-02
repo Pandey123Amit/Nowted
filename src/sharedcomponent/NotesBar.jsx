@@ -6,7 +6,7 @@ function NotesBar() {
     const navigate = useNavigate()
     const { folderId } = useParams()
     const { data } = useFolderDataById(folderId)
-    const folderName = data?.notes[0].folder.name
+    const folderName = data?.notes[0]?.folder?.name ?? ""
 
 
     return (
@@ -26,7 +26,7 @@ function NotesBar() {
                                 [&::-webkit-scrollbar-thumb]:rounded-full
                                 [&::-webkit-scrollbar-thumb:hover]:bg-gray-500
                                 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent'>
-                        {data?.notes?.map((value, index) => {
+                        { data && data?.notes?.map((value, index) => {
                             const trucateTitle = value.preview.slice(0, 23)
 
 
